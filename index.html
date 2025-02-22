@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SOC Dashboard</title>
+  <style>
+    /* Base styles for the dashboard */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    .header {
+      background: #22313F;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      display: block;
+      margin: 0 auto;
+    }
+    .sidebar {
+      position: fixed;
+      background: #2c3e50;
+      top: 70px;
+      left: 0;
+      width: 200px;
+      height: calc(100% - 70px);
+      color: #ecf0f1;
+      padding: 20px;
+    }
+    .sidebar a {
+      display: block;
+      margin: 10px 0;
+      color: #bdc3c7;
+      text-decoration: none;
+    }
+    .sidebar a:hover {
+      color: #ffffff;
+    }
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+    /* Styling for event messages */
+    .event {
+      padding: 5px 10px;
+      margin: 5px 0;
+      border-radius: 3px;
+      color: #fff;
+      font-size: 0.9em;
+    }
+    /* Ransomware overlay styles */
+    #ransomOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: #00ff00;
+      font-family: "Courier New", Courier, monospace;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      overflow: hidden;
+    }
+    #matrixCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    #ransomContent {
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 2px solid #00ff00;
+      border-radius: 8px;
+      max-width: 90%;
+    }
+    #countdown {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+    /* Decryption key form */
+    #decryptForm {
+      margin-top: 20px;
+    }
+    #decryptForm input[type="text"] {
+      padding: 10px;
+      font-size: 1em;
+      width: 200px;
+      border: 1px solid #00ff00;
+      background: #000;
+      color: #00ff00;
+      border-radius: 4px;
+    }
+    #decryptForm button {
+      padding: 10px 15px;
+      font-size: 1em;
+      margin-left: 10px;
+      border: none;
+      background: #00ff00;
+      color: #000;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #decryptForm button:hover {
+      background: #32cd32;
+    }
+  </style>
+</head>
+<body>
+  <!-- Dashboard Content (hidden under the overlay) -->
+  <div class="header">
+    <img src="SOCLOGO.png" alt="SOC Logo" width="200" height="200" />
+    <h1>Security Operations Center Dashboard</h1>
+  </div>
+
+  <div class="sidebar">
+    <h2>Navigation</h2>
+    <a href="#overview">Overview</a>
+    <a href="#alerts">Alerts</a>
+    <a href="#incidents">Incidents</a>
+    <a href="#logs">Logs</a>
+    <a href="#reports">Reports</a>
+    <a href="#settings">Settings</a>
+  </div>
+
+  <div class="content">
+    <section id="overview">
+      <h2>Overview</h2>
+      <div class="grid-container">
+        <div class="card">
+          <h3>Total Alerts</h3>
+          <p id="alertsCount">23 Active Alerts</p>
+        </div>
+        <div class="card">
+          <h3>Incidents</h3>
+          <p id="incidentsCount">5 New Incidents</p>
+        </div>
+        <div class="card">
+          <h3>System Health</h3>
+          <p id="systemHealth">All Systems Operational</p>
+        </div>
+        <div class="card">
+          <h3>Recent Logs</h3>
+          <p id="recentLogs">Last 10 entries displayed</p>
+        </div>
+      </div>
+      <!-- Container for overview events -->
+      <div id="overviewEvents"></div>
+    </section>
+
+    <section id="alerts">
+      <h2>Alerts</h2>
+      <div class="card">
+        <!-- Container for alerts events -->
+        <div id="alertsEvents"></div>
+        <p>List of active alerts will appear here.</p>
+      </div>
+    </section>
+
+    <section id="incidents">
+      <h2>Incidents</h2>
+      <div class="card">
+        <!-- Container for incidents events -->
+        <div id="incidentsEvents"></div>
+        <p>Incident details and status will be displayed here.</p>
+      </div>
+    </section>
+
+    <section id="logs">
+      <h2>Logs</h2>
+      <div class="card">
+        <!-- Container for logs events -->
+        <div id="logsEvents"></div>
+        <p>System logs and event details will be shown here.</p>
+      </div>
+    </section>
+
+    <section id="reports">
+      <h2>Reports</h2>
+      <div class="card">
+        <!-- Container for reports events -->
+        <div id="reportsEvents"></div>
+        <p>Detailed security reports will be available here.</p>
+      </div>
+    </section>
+
+    <section id="settings">
+      <h2>Settings</h2>
+      <div class="card">
+        <p>Configuration options for the SOC dashboard.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Ransomware overlay -->
+  <div id="ransomOverlay">
+    <canvas id="matrixCanvas"></canvas>
+    <div id="ransomContent">
+      <h1 style="font-size: 2.5em; margin: 0;">YOUR WEBSITE HAVE BEEN ENCRYPTED</h1>
+      <p style="margin: 10px 0; font-size: 1.2em;">
+        To recover your data, send <strong>0.5 BTC</strong> to the wallet below.
+      </p>
+      <p style="font-size: 1.1em; margin: 10px 0; color: #ffff00;">
+        BTC Wallet: <code>1A2b3C4d5E6f7G8h9I0jKlmNOPQRstu</code>
+      </p>
+      <div id="countdown">Loading countdown...</div>
+      <p style="margin: 10px 0; font-size: 1em; color: #ff0000;">
+        Failure to pay before the deadline will result in permanent data loss!
+      </p>
+      <!-- Decryption key form -->
+      <div id="decryptForm">
+        <input type="text" id="decryptionKey" placeholder="Enter decryption key" />
+        <button id="decryptButton">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* --------------------------
+       MATRIX EFFECT
+    -----------------------------*/
+    const canvas = document.getElementById("matrixCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Fullscreen canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()-_=+[]{};:,.<>/?".split("");
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#00ff00";
+      ctx.font = fontSize + "px monospace";
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 33);
+
+  
+    const deadline = new Date("FEB 22, 2025 23:00:00 GMT").getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = deadline - now;
+
+      // Calculate time components
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      const countdownEl = document.getElementById("countdown");
+      countdownEl.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+      // If countdown is finished, optionally take action
+      if (distance < 0) {
+        clearInterval(countdownInterval);
+        countdownEl.innerText = "EXPIRED";
+      }
+    }
+    const countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    /* --------------------------
+       DASHBOARD UPDATES & EVENT SIMULATION
+    -----------------------------*/
+    function updateDashboard() {
+      const alerts = Math.floor(Math.random() * 100);
+      const incidents = Math.floor(Math.random() * 20);
+      const logs = Math.floor(Math.random() * 50) + 1;
+      const healthStates = [
+        "All Systems Operational",
+        "Minor Issues Detected",
+        "Service Degradation",
+        "Maintenance Mode"
+      ];
+      
+      document.getElementById("alertsCount").innerText = alerts + " Active Alerts";
+      document.getElementById("incidentsCount").innerText = incidents + " New Incidents";
+      document.getElementById("systemHealth").innerText = healthStates[Math.floor(Math.random() * healthStates.length)];
+      document.getElementById("recentLogs").innerText = "Last " + logs + " entries displayed";
+    }
+    setInterval(updateDashboard, 3000);
+    updateDashboard();
+
+    const eventLevels = [
+      { level: "Critical", color: "#ff0000" },
+      { level: "High", color: "#ff4500" },
+      { level: "Medium", color: "#ffa500" },
+      { level: "Low", color: "#32cd32" }
+    ];
+    const alertsMessages = [
+      "Unauthorized login attempt detected",
+      "Malware signature detected",
+      "Suspicious network activity observed",
+      "Firewall breach attempt"
+    ];
+    const incidentsMessages = [
+      "Data exfiltration suspected",
+      "Network breach in progress",
+      "Compromised credentials identified",
+      "Server anomaly detected"
+    ];
+    const logsMessages = [
+      "User login successful",
+      "File access logged",
+      "Configuration change recorded",
+      "Routine backup completed"
+    ];
+    const reportsMessages = [
+      "Daily security scan completed",
+      "Weekly vulnerability report generated",
+      "Compliance audit passed",
+      "Intrusion detection system report available"
+    ];
+
+    function generateEvent(sectionId, messages) {
+      const container = document.getElementById(sectionId);
+      if (!container) return;
+      
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+      const randomLevel = eventLevels[Math.floor(Math.random() * eventLevels.length)];
+      const timestamp = new Date().toLocaleTimeString();
+      
+      const eventDiv = document.createElement("div");
+      eventDiv.className = "event";
+      eventDiv.style.backgroundColor = randomLevel.color;
+      eventDiv.innerText = `[${timestamp}] [${randomLevel.level}] ${randomMessage}`;
+      
+      container.prepend(eventDiv);
+      
+      setTimeout(() => {
+        eventDiv.remove();
+      }, 10000);
+    }
+    function simulateEvents() {
+      if (Math.random() < 0.5) generateEvent("alertsEvents", alertsMessages);
+      if (Math.random() < 0.5) generateEvent("incidentsEvents", incidentsMessages);
+      if (Math.random() < 0.5) generateEvent("logsEvents", logsMessages);
+      if (Math.random() < 0.5) generateEvent("reportsEvents", reportsMessages);
+    }
+    setInterval(simulateEvents, 3000);
+
+
+// main.js
+document.getElementById("decryptButton").addEventListener("click", function() {
+  const userKey = document.getElementById("decryptionKey").value.trim();
+  if (userKey === config.correction) {
+    const overlay = document.getElementById("ransomOverlay");
+    overlay.remove(); 
+  } else {
+    alert("Incorrect decryption key. Please try again.");
+  }
+});
+
+  </script>
+   <script src="config.js"></script>
+</body>
+</html>

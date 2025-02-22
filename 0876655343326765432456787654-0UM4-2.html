@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hacker Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      font-family: "Courier New", Courier, monospace;
+      color: #0f0;
+      overflow: hidden;
+    }
+    /* Matrix-style background */
+    #matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    /* Dashboard main container */
+    .dashboard-container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .dashboard-header {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .dashboard-card {
+      background: rgba(0, 0, 0, 0.85);
+      border: 2px solid #0f0;
+      padding: 15px;
+      box-shadow: 0 0 10px #0f0;
+      min-height: 150px;
+    }
+    .dashboard-card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+    .dashboard-card p, .dashboard-card ul {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin: 10px 0;
+    }
+    .dashboard-card ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .dashboard-card li::before {
+      content: "• ";
+      color: #0f0;
+    }
+    /* Scrollable event log & chat panels */
+    .log-panel, .chat-panel {
+      background: #111;
+      border: 1px solid #0f0;
+      padding: 5px;
+      height: 120px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+    /* Hacker credentials card */
+    .credentials {
+      font-size: 0.9rem;
+    }
+    .credentials p {
+      margin: 5px 0;
+    }
+    /* Payment section */
+    .payment-section {
+      text-align: center;
+      margin-top: 20px;
+      display: none;
+    }
+    .payment-section input[type="password"] {
+      width: 60%;
+      padding: 8px;
+      margin: 10px 0;
+      background: #111;
+      border: 1px solid #0f0;
+      color: #0f0;
+      font-size: 1rem;
+    }
+    .payment-section input[type="submit"] {
+      padding: 8px 16px;
+      background: #0f0;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    /* Payment button */
+    #revealKeyBtn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #0f0;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Matrix-Style Background -->
+  <canvas id="matrix"></canvas>
+
+  <!-- Main Dashboard Container -->
+  <div class="dashboard-container">
+    <div class="dashboard-header">Hacker Dashboard</div>
+    <div class="dashboard-grid">
+      <!-- Bitcoin Balance Card -->
+      <div class="dashboard-card">
+        <h2>Bitcoin Balance</h2>
+        <p>13.579 BTC</p>
+      </div>
+      <!-- Clubs Hacked Card -->
+      <div class="dashboard-card">
+        <h2>Clubs Hacked</h2>
+        <ul>
+          <li>ADA Club</li>
+          <li>IEEE</li>
+          <li>Game Dev</li>
+          <li>Web Dev</li>
+        </ul>
+      </div>
+      <!-- SOC Status Card -->
+      <div class="dashboard-card">
+        <h2>SOC Status</h2>
+        <p>Waiting for payment...</p>
+        <button id="revealKeyBtn">SOC Malware Payment: Reveal Ransomware Key</button>
+        <!-- Payment Section -->
+        <div class="payment-section" id="paymentSection">
+          <p>Enter Payment Password to reveal the ransomware key:</p>
+          <form id="paymentForm">
+            <input type="password" id="paymentPassword" placeholder="Payment Password" required>
+            <input type="submit" value="Reveal Key">
+          </form>
+        </div>
+      </div>
+      
+      <!-- Hacker Credentials Card -->
+      <div class="dashboard-card">
+        <h2>Hacker Credentials</h2>
+        <div class="credentials">
+          <p><strong>Username:</strong> admin</p>
+          <p><strong>Password:</strong> admin123</p>
+          <p><strong>SSH:</strong> ssh root@198.51.100.77</p>
+        </div>
+      </div>
+      <!-- Event Log Card -->
+      <div class="dashboard-card">
+        <h2>Event Log</h2>
+        <div class="log-panel" id="eventLog">
+          <!-- Live event messages will appear here -->
+        </div>
+      </div>
+      <!-- Hacker Chat Card -->
+      <div class="dashboard-card">
+        <h2>Hacker Chat</h2>
+        <div class="chat-panel" id="hackerChat">
+          <!-- Chat messages will appear here -->
+        </div>
+      </div>
+    </div>
+    <!-- Payment Button for Revealing Ransomware Key -->
+    
+    </div>
+  </div>
+
+  <script>
+    // Matrix-style animation
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const binaryChars = "01".split("");
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(1);
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+      for (let i = 0; i < drops.length; i++) {
+        const text = binaryChars[Math.floor(Math.random() * binaryChars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 33);
+
+    // Simulated live events for the event log
+    const eventLog = document.getElementById("eventLog");
+    const eventMessages = [
+      "Attack on ADA Club successful.",
+      "IEEE firewall breached.",
+      "Game Dev server exploited.",
+      "Web Dev database compromised.",
+      "DDoS attack launched on target.",
+      "Phishing campaign initiated.",
+      "Credential dump acquired."
+    ];
+    function addEventLog() {
+      const msg = eventMessages[Math.floor(Math.random() * eventMessages.length)];
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement("div");
+      entry.textContent = `[${time}] ${msg}`;
+      eventLog.appendChild(entry);
+      // Auto-scroll to bottom
+      eventLog.scrollTop = eventLog.scrollHeight;
+    }
+    setInterval(addEventLog, 4000);
+
+    // Simulated hacker chat messages
+    const hackerChat = document.getElementById("hackerChat");
+    const chatMessages = [
+      "Hacker1: Payment received for the last breach.",
+      "Hacker2: Launching the next attack in 5 minutes.",
+      "Hacker3: SOC is on standby, waiting for funds.",
+      "Hacker1: Our payload is ready. Awaiting command.",
+      "Hacker2: Check the logs; the system is vulnerable."
+    ];
+    function addChatMessage() {
+      const msg = chatMessages[Math.floor(Math.random() * chatMessages.length)];
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement("div");
+      entry.textContent = `[${time}] ${msg}`;
+      hackerChat.appendChild(entry);
+      // Auto-scroll to bottom
+      hackerChat.scrollTop = hackerChat.scrollHeight;
+    }
+    setInterval(addChatMessage, 5000);
+
+    // Handle payment button click: reveal the payment section
+    document.getElementById("revealKeyBtn").addEventListener("click", function() {
+      document.getElementById("paymentSection").style.display = "block";
+      this.style.display = "none";
+    });
+
+    // Payment form handler: check payment password to reveal the ransomware key
+    document.getElementById("paymentForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const paymentPassword = document.getElementById("paymentPassword").value.trim();
+      // The payment password must be longer than 15 characters.
+      // For this demo, the correct password is:
+      const correctPassword = "FLAG{TH3_3ND_IZ_H3R3}";
+      if (paymentPassword === correctPassword) {
+        alert("Ransomware Key Revealed: " + correctPassword);
+      } else {
+        alert("Access Denied: Incorrect payment password.");
+      }
+    });
+  </script>
+</body>
+</html>

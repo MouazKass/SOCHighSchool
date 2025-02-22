@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ransomeware Portal - Login</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      font-family: "Courier New", Courier, monospace;
+    }
+    #matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .login-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid #0f0;
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 0 10px #0f0;
+      background: rgba(0, 0, 0, 0.8);
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #0f0;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #111;
+      border: 1px solid #0f0;
+      color: #0f0;
+      font-size: 1rem;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      background: #0f0;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    input[type="submit"]:hover {
+      background: #0c0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas for the falling ones and zeros -->
+  <canvas id="matrix"></canvas>
+
+  <!-- Login Form -->
+  <div class="login-container">
+    <h1>Ransomeware Portal</h1>
+    <!-- In this demo, the form is handled entirely on the front end -->
+    <form id="loginForm">
+      <input type="text" id="username" name="username" placeholder="Username" required>
+      <input type="password" id="password" name="password" placeholder="Password" required>
+      <input type="submit" value="Login">
+    </form>
+  </div>
+
+  <script>
+    // Matrix-style animation for ones and zeros
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const binaryChars = "01".split("");
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = binaryChars[Math.floor(Math.random() * binaryChars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 33);
+
+    // Front-end simulation: 
+    // The only way to “log in” as admin is by using an SQL injection string
+    // to bypass the unknown password. When detected, a fake SQL data breach error is shown.
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const injectionPattern = "' OR '1'='1";
+
+      // Check if the user is trying to log in as 'admin' using the SQL injection pattern
+      if (username.toLowerCase() === "admin" && password.includes(injectionPattern)) {
+        
+        alert(
+          "SQL Error: Data breach detected!\n\n" +
+          "Query: SELECT * FROM users WHERE username = 'admin' AND password = '' OR '1'='1';\n\n" +
+          "Database Dump:\n" +
+          "-------------------------------------\n" +
+          "ID: 1, Username: admin, Password: supersecret123, Email: admin@example.com\n" +
+          "ID: 2, Username: user1, Password: password1, Email: user1@example.com\n" +
+          "ID: 3, Username: user2, Password: password2, Email: user2@example.com\n" +
+          "-------------------------------------\n\n" +
+          "Immediate action required: Secure your database!"
+        );
+      } else {
+        alert("Access Denied");
+      }
+    });
+  </script>
+</body>
+</html>

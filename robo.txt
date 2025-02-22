@@ -1,0 +1,16 @@
+# Robo Configuration File
+
+[Robot]
+Name = RoboX
+Model = X-200
+SerialNumber = 123456789
+FirmwareVersion = 1.0.0
+
+[Operational]
+Mode = Autonomous
+Speed = 5.0  # in meters per second
+Sensors = LIDAR, Camera, Ultrasonic
+
+[Maintenance]
+LastServiceDate = 2023-10-05
+ServiceNotes = "Routine check-up completed. All systems functional."
