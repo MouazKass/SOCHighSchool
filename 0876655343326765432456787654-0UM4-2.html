@@ -21,10 +21,10 @@
       height: 100%;
       z-index: -1;
     }
-    /* Dashboard main container */
+    /* Dashboard main container now takes full width */
     .dashboard-container {
       padding: 20px;
-      max-width: 1200px;
+      width: 100%;
       margin: 0 auto;
       overflow-y: auto;
       height: 100vh;
@@ -74,14 +74,14 @@
       font-size: 0.8rem;
       line-height: 1.3;
     }
-    /* Hacker credentials card */
+    /* Server credentials card */
     .credentials {
       font-size: 0.9rem;
     }
     .credentials p {
       margin: 5px 0;
     }
-    /* Payment section */
+    /* Payment Section (hidden initially) */
     .payment-section {
       text-align: center;
       margin-top: 20px;
@@ -104,15 +104,16 @@
       font-weight: bold;
       cursor: pointer;
     }
-    /* Payment button */
-    #revealKeyBtn {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
+    /* Smaller Payment Button style to be used inside SOC Status card */
+    .soc-payment-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 10px;
       background: #0f0;
       border: none;
       color: #000;
       font-weight: bold;
+      font-size: 0.8rem;
       cursor: pointer;
     }
   </style>
@@ -131,37 +132,31 @@
         <p>13.579 BTC</p>
       </div>
       <!-- Clubs Hacked Card -->
-      <div class="dashboard-card">
+      <div class="dashboard-card" style="min-height: 300px;">
         <h2>Clubs Hacked</h2>
         <ul>
-          <li>ADA Club</li>
-          <li>IEEE</li>
-          <li>Game Dev</li>
-          <li>Web Dev</li>
+          <li>ADA Club - 0.5 BTC</li>
+          <li>IEEE - 0.75 BTC</li>
+          <li>Game Dev - 1.2 BTC</li>
+          <li>Web Dev - 0.9 BTC</li>
         </ul>
       </div>
-      <!-- SOC Status Card -->
+        </ul>
+      </div>
+      <!-- SOC Status Card with payment button inside -->
       <div class="dashboard-card">
         <h2>SOC Status</h2>
         <p>Waiting for payment...</p>
-        <button id="revealKeyBtn">SOC Malware Payment: Reveal Ransomware Key</button>
-        <!-- Payment Section -->
-        <div class="payment-section" id="paymentSection">
-          <p>Enter Payment Password to reveal the ransomware key:</p>
-          <form id="paymentForm">
-            <input type="password" id="paymentPassword" placeholder="Payment Password" required>
-            <input type="submit" value="Reveal Key">
-          </form>
-        </div>
+        <button id="revealKeyBtn" class="soc-payment-btn">SOC MALWARE PAYMENT: Reveal Ransomware Key</button>
       </div>
-      
-      <!-- Hacker Credentials Card -->
+      <!-- Server Credentials Card -->
       <div class="dashboard-card">
-        <h2>Hacker Credentials</h2>
+        <h2>Server Credentials</h2>
         <div class="credentials">
-          <p><strong>Username:</strong> admin</p>
-          <p><strong>Password:</strong> admin123</p>
-          <p><strong>SSH:</strong> ssh root@198.51.100.77</p>
+          <p><strong>Username:</strong> bandit0</p>
+          <p><strong>Password:</strong> bandit0</p>
+          <p><strong>IP ADDRESS:</strong> 16.16.163.126</p>
+          <p><strong>Access level:</strong> 4</p>
         </div>
       </div>
       <!-- Event Log Card -->
@@ -179,8 +174,13 @@
         </div>
       </div>
     </div>
-    <!-- Payment Button for Revealing Ransomware Key -->
-    
+    <!-- Payment Section -->
+    <div class="payment-section" id="paymentSection">
+      <p>Enter Payment Password to reveal the ransomware key:</p>
+      <form id="paymentForm">
+        <input type="password" id="paymentPassword" placeholder="Payment Password" required>
+        <input type="submit" value="Reveal Key">
+      </form>
     </div>
   </div>
 
@@ -252,21 +252,18 @@
     }
     setInterval(addChatMessage, 5000);
 
-    // Handle payment button click: reveal the payment section
+    
     document.getElementById("revealKeyBtn").addEventListener("click", function() {
       document.getElementById("paymentSection").style.display = "block";
       this.style.display = "none";
     });
 
-    // Payment form handler: check payment password to reveal the ransomware key
     document.getElementById("paymentForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const paymentPassword = document.getElementById("paymentPassword").value.trim();
-      // The payment password must be longer than 15 characters.
-      // For this demo, the correct password is:
-      const correctPassword = "FLAG{TH3_3ND_IZ_H3R3}";
+      const correctPassword = paymentPassword.length > 12 ? paymentPassword : "invalid";
       if (paymentPassword === correctPassword) {
-        alert("Ransomware Key Revealed: " + correctPassword);
+        alert("Ransomware Key Revealed: " + "FLAG{TH3_3ND_IZ_H3R3}");
       } else {
         alert("Access Denied: Incorrect payment password.");
       }
